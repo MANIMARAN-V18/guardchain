@@ -9,6 +9,7 @@ NEO4J_USER = os.getenv("NEO4J_USER")
 NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD")
 
 
+
 class GraphStore:
     def __init__(self):
         self.driver = GraphDatabase.driver(
