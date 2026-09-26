@@ -99,7 +99,12 @@ def generate_pdf_report(wallet_address, edges, freeze_info, chain="Ethereum", cy
     pdf.set_font("Helvetica", "B", 9)
     pdf.set_text_color(2, 132, 199)
     total_val = sum([e.get("value_eth", e.get("value", 0.0)) if isinstance(e, dict) else e[2] for e in edges])
-    curr_unit = "USDT" if chain.lower() == "tron" else "ETH"
+    if chain.lower() == "tron":
+        curr_unit = "USDT"
+    elif chain.lower() in ["bitcoin", "btc"]:
+        curr_unit = "BTC"
+    else:
+        curr_unit = "ETH"
     pdf.cell(50, 5, f"{total_val:.4f} {curr_unit}")
 
     pdf.set_font("Helvetica", "B", 9)
