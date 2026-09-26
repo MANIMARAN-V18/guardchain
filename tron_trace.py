@@ -88,13 +88,11 @@ def get_tron_outgoing_transactions(address):
             from_addr = tx.get("from", "")
             to_addr = tx.get("to", "")
             if from_addr.lower() == address.lower() and to_addr:
-                # Decimals for USDT is 6
                 raw_val = float(tx.get("value", 0))
                 token_info = tx.get("token_info", {})
                 decimals = int(token_info.get("decimals", 6))
                 value_usdt = raw_val / (10 ** decimals)
                 
-                # We prioritize transfers of significant value (> 0.1 USDT)
                 if value_usdt > 0.01:
                     outgoing.append({
                         "from": from_addr,
@@ -104,11 +102,38 @@ def get_tron_outgoing_transactions(address):
                         "tx_hash": tx.get("transaction_id", "")
                     })
                     
-        outgoing.sort(key=lambda x: x["value"], reverse=True)
-        return outgoing
+        if outgoing:
+            outgoing.sort(key=lambda x: x["value"], reverse=True)
+            return outgoing
     except Exception as e:
-        print(f"Error fetching Tron transactions for {address}: {e}")
-        return []
+        print(f"Trongrid fetch error: {e}")
+
+    # Fallback to Tronscan API
+    try:
+        ts_url = f"https://apilist.tronscanapi.com/api/token_trc20/transfers?limit=25&start=0&sort=-timestamp&count=true&relatedAddress={address}&trc20Id={USDT_TRC20_CONTRACT}"
+        ts_res = requests.get(ts_url, headers={"User-Agent": "Mozilla/5.0"}, timeout=8)
+        if ts_res.status_code == 200:
+            ts_txs = ts_res.json().get("token_transfers", [])
+            outgoing = []
+            for tx in ts_txs:
+                f_addr = tx.get("from_address", "")
+                t_addr = tx.get("to_address", "")
+                if f_addr.lower() == address.lower() and t_addr:
+                    val_usdt = float(tx.get("quant", 0)) / 1e6
+                    if val_usdt > 0.01:
+                        outgoing.append({
+                            "from": f_addr,
+                            "to": t_addr,
+                            "value": val_usdt,
+                            "token": "USDT",
+                            "tx_hash": tx.get("transaction_id", "")
+                        })
+            outgoing.sort(key=lambda x: x["value"], reverse=True)
+            return outgoing
+    except Exception as e:
+        print(f"Tronscan fetch error: {e}")
+
+    return []
 
 
 def trace_tron_wallet(start_address, max_hops=MAX_HOPS):
