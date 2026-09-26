@@ -64,5 +64,159 @@
       "0x333_binance"
     ],
     "edge_count": 3
+  },
+  {
+    "case_id": "CASE-ETH-0xDFd529-1790425928",
+    "root_wallet": "0xDFd5293D8e347dFe59E90eFd55b2956a1343963d",
+    "chain": "Ethereum",
+    "freeze_score": 15,
+    "timestamp": "2026-09-26T12:32:08.610443+00:00",
+    "wallets": [
+      "0xDFd5293D8e347dFe59E90eFd55b2956a1343963d",
+      "0x237478e9dd776660e810618c1210bc574961b35f",
+      "0x07676c5caf9b5fd4f4b36f66d66df0a1953625b9"
+    ],
+    "exchanges": [],
+    "edge_count": 2
+  },
+  {
+    "case_id": "CASE-ETH-0xDFd529-1790425935",
+    "root_wallet": "0xDFd5293D8e347dFe59E90eFd55b2956a1343963d",
+    "chain": "Ethereum",
+    "freeze_score": 15,
+    "timestamp": "2026-09-26T12:32:15.689150+00:00",
+    "wallets": [
+      "0xDFd5293D8e347dFe59E90eFd55b2956a1343963d",
+      "0x237478e9dd776660e810618c1210bc574961b35f",
+      "0x07676c5caf9b5fd4f4b36f66d66df0a1953625b9"
+    ],
+    "exchanges": [],
+    "edge_count": 2
+  },
+  {
+    "case_id": "CASE-TRO-TLyqzVGL-1790425951",
+    "root_wallet": "TLyqzVGLV1srkB7dToTAEqgDSfPtXRJZYH",
+    "chain": "Tron",
+    "freeze_score": 0,
+    "timestamp": "2026-09-26T12:32:31.619853+00:00",
+    "wallets": [
+      "TLyqzVGLV1srkB7dToTAEqgDSfPtXRJZYH"
+    ],
+    "exchanges": [],
+    "edge_count": 0
+  },
+  {
+    "case_id": "CASE-BIT-bc1qm34l-1790425953",
+    "root_wallet": "bc1qm34lsc65zpw79lxes69zkqmk6ee3ewf0j77s3h",
+    "chain": "Bitcoin",
+    "freeze_score": 15,
+    "timestamp": "2026-09-26T12:32:33.297484+00:00",
+    "wallets": [
+      "17E7GkVWowAYLmoEQKUy5QC6egi8WTR28R",
+      "bc1qm34lsc65zpw79lxes69zkqmk6ee3ewf0j77s3h",
+      "bc1q6fm0lp0axqmy9vry0n079akq5rl649l7remjxq"
+    ],
+    "exchanges": [],
+    "edge_count": 2
+  },
+  {
+    "case_id": "CASE-TRO-TNiMBwWe-1790425995",
+    "root_wallet": "TNiMBwWerEN5mZ6giFqNLp6bMAD3Qt2CpR",
+    "chain": "Tron",
+    "freeze_score": 15,
+    "timestamp": "2026-09-26T12:33:15.778636+00:00",
+    "wallets": [
+      "TZG2YtMA28c9EuxeXXz7c8U7X7DwbJMhdM",
+      "TNiMBwWerEN5mZ6giFqNLp6bMAD3Qt2CpR",
+      "TP96V2AQaF8BWUWYAvHerBNuK72uoHcEur"
+    ],
+    "exchanges": [],
+    "edge_count": 2
+  },
+  {
+    "case_id": "CASE-ETH-0xDFd529-1790426613",
+    "root_wallet": "0xDFd5293D8e347dFe59E90eFd55b2956a1343963d",
+    "chain": "Ethereum",
+    "freeze_score": 95,
+    "timestamp": "2026-09-26T12:43:33.546932+00:00",
+    "wallets": [
+      "0x84486fb3974b098047b85a7a37685e54a2c5e271",
+      "0x9a226f399d7aa00f8168351f38a6f9f58d804c0e",
+      "0xadb43f015ab6cf153bd917cd0d70e0ce5369f41a",
+      "0xf5b0e3f499f6c133ef4f32ed029fb2f56646fe1f",
+      "0xDFd5293D8e347dFe59E90eFd55b2956a1343963d"
+    ],
+    "exchanges": [
+      "0xadb43f015ab6cf153bd917cd0d70e0ce5369f41a"
+    ],
+    "edge_count": 4
+  },
+  {
+    "case_id": "CASE-ETH-0xDFd529-1790426624",
+    "root_wallet": "0xDFd5293D8e347dFe59E90eFd55b2956a1343963d",
+    "chain": "Ethereum",
+    "freeze_score": 95,
+    "timestamp": "2026-09-26T12:43:44.667660+00:00",
+    "wallets": [
+      "0x84486fb3974b098047b85a7a37685e54a2c5e271",
+      "0x9a226f399d7aa00f8168351f38a6f9f58d804c0e",
+      "0x28c6c06298d514db089934071355e5743bf21d60",
+      "0xadb43f015ab6cf153bd917cd0d70e0ce5369f41a",
+      "0xDFd5293D8e347dFe59E90eFd55b2956a1343963d",
+      "0xf5b0e3f499f6c133ef4f32ed029fb2f56646fe1f"
+    ],
+    "exchanges": [
+      "0xadb43f015ab6cf153bd917cd0d70e0ce5369f41a",
+      "0x28c6c06298d514db089934071355e5743bf21d60",
+      "0x28c6c06298d514db089934071355e5743bf21d60",
+      "0x28c6c06298d514db089934071355e5743bf21d60",
+      "0x28c6c06298d514db089934071355e5743bf21d60"
+    ],
+    "edge_count": 8
+  },
+  {
+    "case_id": "CASE-ETH-0xDFd529-1790426630",
+    "root_wallet": "0xDFd5293D8e347dFe59E90eFd55b2956a1343963d",
+    "chain": "Ethereum",
+    "freeze_score": 95,
+    "timestamp": "2026-09-26T12:43:50.179177+00:00",
+    "wallets": [
+      "0xadb43f015ab6cf153bd917cd0d70e0ce5369f41a",
+      "0x6982508145454ce325ddbe47a25d4ec3d2311933",
+      "0xDFd5293D8e347dFe59E90eFd55b2956a1343963d"
+    ],
+    "exchanges": [
+      "0xadb43f015ab6cf153bd917cd0d70e0ce5369f41a",
+      "0x6982508145454ce325ddbe47a25d4ec3d2311933"
+    ],
+    "edge_count": 2
+  },
+  {
+    "case_id": "CASE-TRO-TNiMBwWe-1790426634",
+    "root_wallet": "TNiMBwWerEN5mZ6giFqNLp6bMAD3Qt2CpR",
+    "chain": "Tron",
+    "freeze_score": 15,
+    "timestamp": "2026-09-26T12:43:54.490415+00:00",
+    "wallets": [
+      "TP96V2AQaF8BWUWYAvHerBNuK72uoHcEur",
+      "TZG2YtMA28c9EuxeXXz7c8U7X7DwbJMhdM",
+      "TNiMBwWerEN5mZ6giFqNLp6bMAD3Qt2CpR"
+    ],
+    "exchanges": [],
+    "edge_count": 2
+  },
+  {
+    "case_id": "CASE-BIT-bc1qm34l-1790426636",
+    "root_wallet": "bc1qm34lsc65zpw79lxes69zkqmk6ee3ewf0j77s3h",
+    "chain": "Bitcoin",
+    "freeze_score": 15,
+    "timestamp": "2026-09-26T12:43:56.726915+00:00",
+    "wallets": [
+      "bc1qfqtgkeuv7pr2zv7hkutrhugvrlqgs5twcauvck",
+      "bc1qm34lsc65zpw79lxes69zkqmk6ee3ewf0j77s3h",
+      "3C5CArBaBMc1Wa74Fs3toTUVKrBezr1MLS"
+    ],
+    "exchanges": [],
+    "edge_count": 2
   }
 ]

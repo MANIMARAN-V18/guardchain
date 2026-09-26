@@ -1,19 +1,57 @@
 """
 Machine Learning Wallet Behavior Clustering Module for GuardChain
-Uses scikit-learn K-Means to cluster traced wallets by transaction velocity, value dispersion, and off-ramp proximity.
+Pure-Python K-Means feature clustering for resilient, lightweight execution on free-tier cloud environments.
 """
 
-import numpy as np
-from sklearn.cluster import KMeans
+import math
+
+
+def _euclidean_dist(v1, v2):
+    return math.sqrt(sum((a - b) ** 2 for a, b in zip(v1, v2)))
+
+
+def _kmeans_cluster(features, k, max_iters=25):
+    """
+    Pure Python K-Means implementation (Lloyd's algorithm).
+    """
+    n = len(features)
+    if n <= k:
+        return list(range(n))
+
+    # Initialize centroids deterministically
+    step = n // k
+    centroids = [list(features[i * step]) for i in range(k)]
+    labels = [0] * n
+
+    for _ in range(max_iters):
+        # Assign points to nearest centroid
+        new_labels = []
+        for point in features:
+            dists = [_euclidean_dist(point, c) for c in centroids]
+            min_idx = dists.index(min(dists))
+            new_labels.append(min_idx)
+
+        if new_labels == labels:
+            break
+        labels = new_labels
+
+        # Recompute centroids
+        for c_idx in range(k):
+            members = [features[i] for i, lbl in enumerate(labels) if lbl == c_idx]
+            if members:
+                dim = len(members[0])
+                centroids[c_idx] = [sum(m[d] for m in members) / len(members) for d in range(dim)]
+
+    return labels
 
 
 def cluster_traced_wallets(edges, n_clusters=3):
     """
-    Extracts numerical feature vectors for all distinct wallets in the trace graph
+    Extracts feature vectors for all distinct wallets in the trace graph
     and applies K-Means clustering to partition them into behavioral categories:
-      - Cluster 0: High-Velocity Dispatcher / Primary Suspect
-      - Cluster 1: Intermediary Mules / Smurfing Wallets
-      - Cluster 2: Off-Ramp Gateway / Liquidation Points
+      - Cluster 0: Core Dispatcher / Primary Suspect
+      - Cluster 1: Layering Intermediary Mule
+      - Cluster 2: Off-Ramp Liquidation Node
     """
     if not edges or len(edges) < 2:
         return {
@@ -36,9 +74,9 @@ def cluster_traced_wallets(edges, n_clusters=3):
             is_ex = bool(edge[4])
 
         if u not in wallet_stats:
-            wallet_stats[u] = {"sent_vol": 0, "recv_vol": 0, "tx_count": 0, "max_hop": hop, "is_ex": 0}
+            wallet_stats[u] = {"sent_vol": 0.0, "recv_vol": 0.0, "tx_count": 0, "max_hop": hop, "is_ex": 0}
         if v not in wallet_stats:
-            wallet_stats[v] = {"sent_vol": 0, "recv_vol": 0, "tx_count": 0, "max_hop": hop, "is_ex": 1 if is_ex else 0}
+            wallet_stats[v] = {"sent_vol": 0.0, "recv_vol": 0.0, "tx_count": 0, "max_hop": hop, "is_ex": 1 if is_ex else 0}
 
         wallet_stats[u]["sent_vol"] += val
         wallet_stats[u]["tx_count"] += 1
@@ -54,19 +92,16 @@ def cluster_traced_wallets(edges, n_clusters=3):
         features.append([
             st["sent_vol"],
             st["recv_vol"],
-            st["tx_count"],
-            st["max_hop"],
-            st["is_ex"] * 5.0
+            float(st["tx_count"]),
+            float(st["max_hop"]),
+            float(st["is_ex"] * 5.0)
         ])
 
-    X = np.array(features, dtype=float)
     k = min(n_clusters, len(wallets))
-    
     if k < 2:
         cluster_labels = [0] * len(wallets)
     else:
-        kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
-        cluster_labels = kmeans.fit_predict(X).tolist()
+        cluster_labels = _kmeans_cluster(features, k)
 
     cluster_names = {
         0: "Core Dispatcher / Staging",
@@ -86,6 +121,6 @@ def cluster_traced_wallets(edges, n_clusters=3):
 
     return {
         "ml_clusters": result,
-        "method": "Unsupervised K-Means Feature Clustering (Scikit-Learn)",
+        "method": "Unsupervised K-Means Behavioral Clustering",
         "cluster_count": len(set(cluster_labels))
     }

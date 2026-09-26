@@ -1,0 +1,102 @@
+[
+  {
+    "log_id": "LOG-da2673a6dd",
+    "timestamp": "2026-09-26T12:43:56.404339+00:00",
+    "officer_id": "IO-CYBER-8841",
+    "role": "Investigating Officer",
+    "wallet_queried": "bc1qm34lsc65zpw79lxes69zkqmk6ee3ewf0j77s3h",
+    "chain": "Bitcoin",
+    "ip_address": "127.0.0.1",
+    "integrity_checksum": "da2673a6ddfdc37e82c0b819397f5bf21b9ec9fb47642c96ab2fdf2dc8f71d05"
+  },
+  {
+    "log_id": "LOG-e611bf9261",
+    "timestamp": "2026-09-26T12:43:54.065496+00:00",
+    "officer_id": "IO-CYBER-8841",
+    "role": "Investigating Officer",
+    "wallet_queried": "TNiMBwWerEN5mZ6giFqNLp6bMAD3Qt2CpR",
+    "chain": "Tron",
+    "ip_address": "127.0.0.1",
+    "integrity_checksum": "e611bf9261cd3738131ef57b58f36fda24e64c90f8cd00a35bc9e3066b6981e2"
+  },
+  {
+    "log_id": "LOG-3f33bccc76",
+    "timestamp": "2026-09-26T12:43:49.820068+00:00",
+    "officer_id": "IO-CYBER-8841",
+    "role": "Investigating Officer",
+    "wallet_queried": "0xDFd5293D8e347dFe59E90eFd55b2956a1343963d",
+    "chain": "Ethereum",
+    "ip_address": "127.0.0.1",
+    "integrity_checksum": "3f33bccc76a6942b2fefc9e40425f41cc0db3d626064fafb50e30f505fc36c17"
+  },
+  {
+    "log_id": "LOG-42aa26f72a",
+    "timestamp": "2026-09-26T12:43:44.321769+00:00",
+    "officer_id": "IO-CYBER-8841",
+    "role": "Investigating Officer",
+    "wallet_queried": "0xDFd5293D8e347dFe59E90eFd55b2956a1343963d",
+    "chain": "Ethereum",
+    "ip_address": "127.0.0.1",
+    "integrity_checksum": "42aa26f72a661caccd25a1cc06c0586cf77bfbb8a3a1f769ff5da5de7db70073"
+  },
+  {
+    "log_id": "LOG-943d188abf",
+    "timestamp": "2026-09-26T12:43:32.539392+00:00",
+    "officer_id": "IO-CYBER-8841",
+    "role": "Investigating Officer",
+    "wallet_queried": "0xDFd5293D8e347dFe59E90eFd55b2956a1343963d",
+    "chain": "Ethereum",
+    "ip_address": "127.0.0.1",
+    "integrity_checksum": "943d188abfa439660742b9eaf64747311862a284ce4ce6f5e096fd857f878421"
+  },
+  {
+    "log_id": "LOG-5707eb33c8",
+    "timestamp": "2026-09-26T12:33:15.161142+00:00",
+    "officer_id": "IO-CYBER-8841",
+    "role": "Investigating Officer",
+    "wallet_queried": "TNiMBwWerEN5mZ6giFqNLp6bMAD3Qt2CpR",
+    "chain": "Tron",
+    "ip_address": "127.0.0.1",
+    "integrity_checksum": "5707eb33c8d1cab19fff2bcea79f04bd482204873b2787575412d19212b8565b"
+  },
+  {
+    "log_id": "LOG-f5df2a0914",
+    "timestamp": "2026-09-26T12:32:33.279413+00:00",
+    "officer_id": "IO-CYBER-8841",
+    "role": "Investigating Officer",
+    "wallet_queried": "bc1qm34lsc65zpw79lxes69zkqmk6ee3ewf0j77s3h",
+    "chain": "Bitcoin",
+    "ip_address": "127.0.0.1",
+    "integrity_checksum": "f5df2a09145c2f4a99eef7b6b8291250c98786a9cf140f9a7ebfd5b0bad6a1be"
+  },
+  {
+    "log_id": "LOG-8cf071c0a7",
+    "timestamp": "2026-09-26T12:32:31.436250+00:00",
+    "officer_id": "IO-CYBER-8841",
+    "role": "Investigating Officer",
+    "wallet_queried": "TLyqzVGLV1srkB7dToTAEqgDSfPtXRJZYH",
+    "chain": "Tron",
+    "ip_address": "127.0.0.1",
+    "integrity_checksum": "8cf071c0a79fe60e942c6ceefbda5c12a5643186a971be0177a715d144847f81"
+  },
+  {
+    "log_id": "LOG-c3918b9623",
+    "timestamp": "2026-09-26T12:32:15.668977+00:00",
+    "officer_id": "IO-CYBER-8841",
+    "role": "Investigating Officer",
+    "wallet_queried": "0xDFd5293D8e347dFe59E90eFd55b2956a1343963d",
+    "chain": "Ethereum",
+    "ip_address": "127.0.0.1",
+    "integrity_checksum": "c3918b96231e430d9af2211b3fb8e81711f3de8ddf69602745156fd027137d95"
+  },
+  {
+    "log_id": "LOG-261ac35a6d",
+    "timestamp": "2026-09-26T12:32:08.333998+00:00",
+    "officer_id": "IO-CYBER-8841",
+    "role": "Investigating Officer",
+    "wallet_queried": "0xDFd5293D8e347dFe59E90eFd55b2956a1343963d",
+    "chain": "Ethereum",
+    "ip_address": "127.0.0.1",
+    "integrity_checksum": "261ac35a6d2dba5ce2d2fd196c73a19b0fff177c10ab9faa4f8c959625955a65"
+  }
+]

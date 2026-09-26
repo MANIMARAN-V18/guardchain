@@ -16,7 +16,7 @@ Complete Feature Set:
 """
 
 import io
-import pandas as pd
+import csv
 from fastapi import FastAPI, Query, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -188,13 +188,19 @@ def export_ledger_csv(
     hops: int = Query(4)
 ):
     """
-    Uses Pandas to export the full traced transaction ledger to CSV.
+    Exports the full traced transaction ledger to CSV.
     """
     data = _run_trace_pipeline(wallet_address.strip(), chain=chain, hops=hops)
-    df = pd.DataFrame(data["edges"])
+    edges = data.get("edges", [])
     
     output = io.StringIO()
-    df.to_csv(output, index=False)
+    if edges:
+        fieldnames = list(edges[0].keys())
+        writer = csv.DictWriter(output, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(edges)
+    else:
+        output.write("from,to,value_eth,value,currency,hop,is_exchange,exchange_label\n")
     
     return Response(
         content=output.getvalue(),
