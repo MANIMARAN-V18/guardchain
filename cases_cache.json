@@ -273,5 +273,75 @@
     ],
     "exchanges": [],
     "edge_count": 6
+  },
+  {
+    "case_id": "CASE-ETH-0xtest-1790428923",
+    "root_wallet": "0xtest",
+    "chain": "Ethereum",
+    "freeze_score": 50,
+    "timestamp": "2026-09-26T13:22:03.225807+00:00",
+    "wallets": [
+      "0xtest"
+    ],
+    "exchanges": [],
+    "edge_count": 0
+  },
+  {
+    "case_id": "CASE-TRO-TU3kjFuh-1790429457",
+    "root_wallet": "TU3kjFuhtEo42tsCBtfYUAZxoqQ4yuSLQ5",
+    "chain": "Tron",
+    "freeze_score": 95,
+    "timestamp": "2026-09-26T13:30:57.894100+00:00",
+    "wallets": [
+      "TWnHGFEjgrJpHXPiPnddPtdCwKGMwpxK8T",
+      "TU3kjFuhtEo42tsCBtfYUAZxoqQ4yuSLQ5"
+    ],
+    "exchanges": [
+      "TWnHGFEjgrJpHXPiPnddPtdCwKGMwpxK8T",
+      "TWnHGFEjgrJpHXPiPnddPtdCwKGMwpxK8T"
+    ],
+    "edge_count": 2
+  },
+  {
+    "case_id": "CASE-TRO-TU3kjFuh-1790429812",
+    "root_wallet": "TU3kjFuhtEo42tsCBtfYUAZxoqQ4yuSLQ5",
+    "chain": "Tron",
+    "freeze_score": 0,
+    "timestamp": "2026-09-26T13:36:52.044989+00:00",
+    "wallets": [
+      "TU3kjFuhtEo42tsCBtfYUAZxoqQ4yuSLQ5"
+    ],
+    "exchanges": [],
+    "edge_count": 0
+  },
+  {
+    "case_id": "CASE-TRO-TU3kjFuh-1790429816",
+    "root_wallet": "TU3kjFuhtEo42tsCBtfYUAZxoqQ4yuSLQ5",
+    "chain": "Tron",
+    "freeze_score": 95,
+    "timestamp": "2026-09-26T13:36:56.220410+00:00",
+    "wallets": [
+      "TWnHGFEjgrJpHXPiPnddPtdCwKGMwpxK8T",
+      "TU3kjFuhtEo42tsCBtfYUAZxoqQ4yuSLQ5"
+    ],
+    "exchanges": [
+      "TWnHGFEjgrJpHXPiPnddPtdCwKGMwpxK8T",
+      "TWnHGFEjgrJpHXPiPnddPtdCwKGMwpxK8T"
+    ],
+    "edge_count": 2
+  },
+  {
+    "case_id": "CASE-TRO-TJRabPrw-1790429822",
+    "root_wallet": "TJRabPrwbZy45sbavfcjinPJC18kjpRTv8",
+    "chain": "Tron",
+    "freeze_score": 15,
+    "timestamp": "2026-09-26T13:37:02.276795+00:00",
+    "wallets": [
+      "TQvGknsPw5bpBEkUFU7fABM63BifJceEii",
+      "TJRabPrwbZy45sbavfcjinPJC18kjpRTv8",
+      "TRGsjk84qAKfs6zPTgAMEaWXqpBuYCXsws"
+    ],
+    "exchanges": [],
+    "edge_count": 4
   }
 ]

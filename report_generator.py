@@ -196,17 +196,18 @@ def generate_pdf_report(wallet_address, edges, freeze_info, chain="Ethereum", cy
     pdf.set_text_color(255, 255, 255)
     pdf.set_font("Helvetica", "B", 8)
     
-    col_w = [14, 52, 52, 36, 36]
+    col_w = [12, 50, 50, 40, 38]
     pdf.cell(col_w[0], 7, "Hop", 1, 0, "C", fill=True)
     pdf.cell(col_w[1], 7, "Sender (From)", 1, 0, "C", fill=True)
     pdf.cell(col_w[2], 7, "Receiver (To)", 1, 0, "C", fill=True)
-    pdf.cell(col_w[3], 7, f"Value ({curr_unit})", 1, 0, "C", fill=True)
+    pdf.cell(col_w[3], 7, "Amount / Token", 1, 0, "C", fill=True)
     pdf.cell(col_w[4], 7, "Classification", 1, 1, "C", fill=True)
 
     # Rows
     pdf.set_font("Courier", "", 7.5)
     row_alt = False
     for item in edges:
+        row_curr = curr_unit
         if isinstance(item, dict):
             f_addr = item.get("from", "")
             t_addr = item.get("to", "")
@@ -214,6 +215,7 @@ def generate_pdf_report(wallet_address, edges, freeze_info, chain="Ethereum", cy
             h = item.get("hop", 1)
             is_exc = item.get("is_exchange", False)
             exc_label = item.get("exchange_label", "Exchange") if is_exc else "Private Wallet"
+            row_curr = item.get("currency", curr_unit)
         else:
             f_addr = item[0]
             t_addr = item[1]
@@ -221,6 +223,8 @@ def generate_pdf_report(wallet_address, edges, freeze_info, chain="Ethereum", cy
             h = item[3]
             is_exc = item[4]
             exc_label = item[5] if len(item) > 5 and item[5] else ("Exchange" if is_exc else "Private Wallet")
+            if len(item) > 6 and item[6]:
+                row_curr = str(item[6])
 
         if is_exc:
             pdf.set_fill_color(254, 226, 226)
@@ -236,7 +240,7 @@ def generate_pdf_report(wallet_address, edges, freeze_info, chain="Ethereum", cy
         pdf.cell(col_w[1], 6, f"{f_addr[:8]}...{f_addr[-6:]}", 1, 0, "C", fill=True)
         pdf.cell(col_w[2], 6, f"{t_addr[:8]}...{t_addr[-6:]}", 1, 0, "C", fill=True)
         pdf.set_font("Helvetica", "B" if is_exc else "", 7.5)
-        pdf.cell(col_w[3], 6, f"{val:.4f}", 1, 0, "R", fill=True)
+        pdf.cell(col_w[3], 6, f"{val:.4f} {row_curr}", 1, 0, "R", fill=True)
         pdf.cell(col_w[4], 6, exc_label, 1, 1, "C", fill=True)
         pdf.set_font("Courier", "", 7.5)
         row_alt = not row_alt

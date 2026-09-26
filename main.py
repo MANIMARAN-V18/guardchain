@@ -59,14 +59,14 @@ def root():
     }
 
 
-def _run_trace_pipeline(wallet_address: str, chain: str = "Ethereum", hops: int = 4):
+def _run_trace_pipeline(wallet_address: str, chain: str = "Ethereum", hops: int = 4, usdt_only: bool = True):
     """
     Unified multi-chain tracing & intelligence pipeline.
     """
     chain_clean = chain.strip().capitalize()
     
     if chain_clean == "Tron":
-        raw_edges = trace_tron_wallet(wallet_address, max_hops=hops)
+        raw_edges = trace_tron_wallet(wallet_address, max_hops=hops, usdt_only=usdt_only)
         curr_unit = "USDT"
     elif chain_clean in ["Bitcoin", "Btc"]:
         chain_clean = "Bitcoin"
@@ -80,7 +80,10 @@ def _run_trace_pipeline(wallet_address: str, chain: str = "Ethereum", hops: int 
     # Convert raw edges into clean structured dictionaries
     structured_edges = []
     for edge in raw_edges:
-        if len(edge) >= 6:
+        token_currency = curr_unit
+        if len(edge) >= 7:
+            f_addr, t_addr, val, hop, is_ex, label, token_currency = edge[0], edge[1], edge[2], edge[3], edge[4], edge[5], edge[6]
+        elif len(edge) == 6:
             f_addr, t_addr, val, hop, is_ex, label = edge[0], edge[1], edge[2], edge[3], edge[4], edge[5]
         elif len(edge) == 5:
             f_addr, t_addr, val, hop, is_ex = edge[0], edge[1], edge[2], edge[3], edge[4]
@@ -94,7 +97,7 @@ def _run_trace_pipeline(wallet_address: str, chain: str = "Ethereum", hops: int 
             "to": t_addr,
             "value_eth": float(val),
             "value": float(val),
-            "currency": curr_unit,
+            "currency": token_currency,
             "hop": int(hop),
             "is_exchange": bool(is_ex),
             "exchange_label": label
@@ -141,24 +144,26 @@ def _run_trace_pipeline(wallet_address: str, chain: str = "Ethereum", hops: int 
 def trace(
     wallet_address: str,
     chain: str = Query("Ethereum", description="Blockchain network: Ethereum, Tron, or Bitcoin"),
-    hops: int = Query(4, ge=1, le=6, description="Trace depth")
+    hops: int = Query(4, ge=1, le=6, description="Trace depth"),
+    usdt_only: bool = Query(True, description="Filter Tron transfers to USDT-only (ignoring random meme/airdrop tokens)")
 ):
     if not wallet_address or len(wallet_address.strip()) < 8:
         raise HTTPException(status_code=400, detail="Invalid wallet address provided.")
 
-    return _run_trace_pipeline(wallet_address.strip(), chain=chain, hops=hops)
+    return _run_trace_pipeline(wallet_address.strip(), chain=chain, hops=hops, usdt_only=usdt_only)
 
 
 @app.get("/trace/{wallet_address}/report")
 def download_pdf_report(
     wallet_address: str,
     chain: str = Query("Ethereum", description="Blockchain network: Ethereum, Tron, or Bitcoin"),
-    hops: int = Query(4, ge=1, le=6)
+    hops: int = Query(4, ge=1, le=6),
+    usdt_only: bool = Query(True, description="Filter Tron transfers to USDT-only")
 ):
     if not wallet_address or len(wallet_address.strip()) < 8:
         raise HTTPException(status_code=400, detail="Invalid wallet address.")
 
-    data = _run_trace_pipeline(wallet_address.strip(), chain=chain, hops=hops)
+    data = _run_trace_pipeline(wallet_address.strip(), chain=chain, hops=hops, usdt_only=usdt_only)
     pdf_bytes = generate_pdf_report(
         wallet_address=data["wallet"],
         edges=data["edges"],

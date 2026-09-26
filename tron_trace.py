@@ -109,16 +109,20 @@ def check_tron_exchange(address):
     return verdict
 
 
-def get_tron_outgoing_transactions(address):
+def get_tron_outgoing_transactions(address, usdt_only=True):
     """
-    Fetches genuine TRC-20 USDT transfers sent from `address`.
-    Enforces official USDT contract address validation and 6-decimal precision.
+    Fetches TRC-20 transfers sent from `address`.
+    If `usdt_only=True`, filters strictly to official Tether USDT contract transfers.
+    Returns: list of dicts with 'from', 'to', 'value', 'token', 'contract', 'tx_hash'
     """
     outgoing = []
 
-    # Primary: Tronscan API with official USDT contract filter
+    # Primary: Tronscan API
     try:
-        ts_url = f"https://apilist.tronscanapi.com/api/token_trc20/transfers?limit=25&start=0&sort=-timestamp&count=true&relatedAddress={address}&trc20Id={OFFICIAL_USDT_CONTRACT}"
+        ts_url = f"https://apilist.tronscanapi.com/api/token_trc20/transfers?limit=25&start=0&sort=-timestamp&count=true&relatedAddress={address}"
+        if usdt_only:
+            ts_url += f"&trc20Id={OFFICIAL_USDT_CONTRACT}"
+            
         ts_res = requests.get(ts_url, headers={"User-Agent": "Mozilla/5.0"}, timeout=5)
         if ts_res.status_code == 200:
             ts_txs = ts_res.json().get("token_transfers", [])
@@ -130,19 +134,22 @@ def get_tron_outgoing_transactions(address):
                 
                 # Check that transaction is outgoing from target
                 if f_addr.lower() == address.lower() and t_addr:
+                    symbol = token_info.get("tokenAbbr") or token_info.get("tokenName") or "USDT"
+                    
+                    if usdt_only and token_contract != OFFICIAL_USDT_CONTRACT and symbol.upper() != "USDT":
+                        continue
+
                     # Parse decimal precision safely
                     decimals = int(token_info.get("tokenDecimal", 6))
                     raw_quant = float(tx.get("quant", 0))
-                    val_usdt = raw_quant / (10 ** decimals)
+                    val = raw_quant / (10 ** decimals)
                     
-                    symbol = token_info.get("tokenAbbr", "USDT")
-                    # Accept official USDT or other legitimate TRC-20 transfers
-                    if val_usdt > 0.01:
+                    if val > 0.001:
                         outgoing.append({
                             "from": f_addr,
                             "to": t_addr,
-                            "value": val_usdt,
-                            "token": symbol,
+                            "value": val,
+                            "token": symbol.upper(),
                             "contract": token_contract,
                             "tx_hash": tx.get("transaction_id", "")
                         })
@@ -171,16 +178,20 @@ def get_tron_outgoing_transactions(address):
                     raw_val = float(tx.get("value", 0))
                     token_info = tx.get("token_info", {})
                     token_contract = token_info.get("address", "")
-                    decimals = int(token_info.get("decimals", 6))
-                    value_usdt = raw_val / (10 ** decimals)
-                    symbol = token_info.get("symbol", "USDT")
+                    symbol = token_info.get("symbol") or token_info.get("name") or "USDT"
                     
-                    if value_usdt > 0.01:
+                    if usdt_only and token_contract != OFFICIAL_USDT_CONTRACT and symbol.upper() != "USDT":
+                        continue
+
+                    decimals = int(token_info.get("decimals", 6))
+                    val = raw_val / (10 ** decimals)
+                    
+                    if val > 0.001:
                         outgoing.append({
                             "from": from_addr,
                             "to": to_addr,
-                            "value": value_usdt,
-                            "token": symbol,
+                            "value": val,
+                            "token": symbol.upper(),
                             "contract": token_contract,
                             "tx_hash": tx.get("transaction_id", "")
                         })
@@ -194,10 +205,10 @@ def get_tron_outgoing_transactions(address):
     return []
 
 
-def trace_tron_wallet(start_address, max_hops=MAX_HOPS):
+def trace_tron_wallet(start_address, max_hops=MAX_HOPS, usdt_only=True):
     """
-    Follows Tron USDT funds hop by hop from start_address.
-    Returns edges: (from_address, to_address, value_usdt, hop, is_exchange, exchange_label)
+    Follows Tron TRC-20 funds hop by hop from start_address.
+    Returns edges: (from_address, to_address, value, hop, is_exchange, exchange_label, token_symbol)
     """
     edges = []
     visited = set()
@@ -212,12 +223,13 @@ def trace_tron_wallet(start_address, max_hops=MAX_HOPS):
                 continue
             visited.add(address.lower())
 
-            outgoing = get_tron_outgoing_transactions(address)
+            outgoing = get_tron_outgoing_transactions(address, usdt_only=usdt_only)
             top_tx = outgoing[:TOP_N_TX_PER_WALLET]
 
             for tx in top_tx:
                 to_address = tx["to"]
-                value_usdt = tx["value"]
+                value = tx["value"]
+                token_sym = tx.get("token", "USDT")
 
                 if not to_address:
                     continue
@@ -227,7 +239,7 @@ def trace_tron_wallet(start_address, max_hops=MAX_HOPS):
                 is_ex = exchange_info["is_exchange"]
                 label = exchange_info.get("label", "Exchange" if is_ex else None)
 
-                edges.append((address, to_address, value_usdt, hop, is_ex, label))
+                edges.append((address, to_address, value, hop, is_ex, label, token_sym))
 
                 if not is_ex:
                     next_layer.append(to_address)

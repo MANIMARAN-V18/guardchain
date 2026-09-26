@@ -1,5 +1,45 @@
 [
   {
+    "log_id": "LOG-a83b5795e6",
+    "timestamp": "2026-09-26T13:37:01.903044+00:00",
+    "officer_id": "IO-CYBER-8841",
+    "role": "Investigating Officer",
+    "wallet_queried": "TJRabPrwbZy45sbavfcjinPJC18kjpRTv8",
+    "chain": "Tron",
+    "ip_address": "127.0.0.1",
+    "integrity_checksum": "a83b5795e635c22fa704fc1490c6cdd3869e3e08b1cc88eada58a71726b7c505"
+  },
+  {
+    "log_id": "LOG-aea8805b81",
+    "timestamp": "2026-09-26T13:36:55.875167+00:00",
+    "officer_id": "IO-CYBER-8841",
+    "role": "Investigating Officer",
+    "wallet_queried": "TU3kjFuhtEo42tsCBtfYUAZxoqQ4yuSLQ5",
+    "chain": "Tron",
+    "ip_address": "127.0.0.1",
+    "integrity_checksum": "aea8805b8185d80e76eeb9fa9537b90c30a88cd09955ff1db56a8e3d15923471"
+  },
+  {
+    "log_id": "LOG-8358b4df05",
+    "timestamp": "2026-09-26T13:36:51.107824+00:00",
+    "officer_id": "IO-CYBER-8841",
+    "role": "Investigating Officer",
+    "wallet_queried": "TU3kjFuhtEo42tsCBtfYUAZxoqQ4yuSLQ5",
+    "chain": "Tron",
+    "ip_address": "127.0.0.1",
+    "integrity_checksum": "8358b4df05b54240151e16fd4813e8d079ec46e37569f8894165b3e7da1dec78"
+  },
+  {
+    "log_id": "LOG-e11ceac7b7",
+    "timestamp": "2026-09-26T13:30:57.453981+00:00",
+    "officer_id": "IO-CYBER-8841",
+    "role": "Investigating Officer",
+    "wallet_queried": "TU3kjFuhtEo42tsCBtfYUAZxoqQ4yuSLQ5",
+    "chain": "Tron",
+    "ip_address": "127.0.0.1",
+    "integrity_checksum": "e11ceac7b7cea91498a1e821220fae34dd1d0c33bee30d17449e141cdfb8e1d7"
+  },
+  {
     "log_id": "LOG-fad18de7cb",
     "timestamp": "2026-09-26T13:10:05.719794+00:00",
     "officer_id": "IO-CYBER-8841",
