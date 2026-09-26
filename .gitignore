@@ -1,7 +1,35 @@
+# Python & Virtual Environments
 venv/
+.venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Environment variables & API Keys (Security)
 .env
+.env.*
+*.env
+!.env.example
+
+# Node / Frontend Build Artifacts
 node_modules/
 frontend/node_modules/
 frontend/dist/
-__pycache__/
-*.pyc
+frontend/.env.local
+frontend/.env.*.local
+
+# Logs & Temporary Data Files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS & Editor Specific Files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
