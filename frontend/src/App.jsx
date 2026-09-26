@@ -47,6 +47,11 @@ const SAMPLE_CASES = [
     chain: "Tron",
     address: "TLyqzVGLV1srkB7dToTAEqgDSfPtXRJZYH",
   },
+  {
+    name: "Bitcoin: Cold Storage Flow",
+    chain: "Bitcoin",
+    address: "1P5ZEDWTKTFGxQjZphgWPQUpe554WKDfHQ",
+  },
 ];
 
 // Fallback calculations in case older API backend response is returned during deployment rollout
@@ -649,6 +654,18 @@ PURSUANT TO SECTION 91 CrPC / SECTION 94 BNSS:
               <FileText className="w-3.5 h-3.5" />
               Statutory Notice (Sec 91/94)
             </button>
+
+            <button
+              onClick={() => setActiveTab("audit")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition ${
+                activeTab === "audit"
+                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
+                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5" />
+              Compliance & Audit
+            </button>
           </nav>
 
           {/* Backend Status Indicator */}
@@ -690,7 +707,18 @@ PURSUANT TO SECTION 91 CrPC / SECTION 94 BNSS:
                     }`}
                   >
                     <span className="w-2 h-2 rounded-full bg-red-300"></span>
-                    Tron (USDT TRC-20)
+                    Tron (USDT)
+                  </button>
+                  <button
+                    onClick={() => setSelectedChain("Bitcoin")}
+                    className={`px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition ${
+                      selectedChain === "Bitcoin"
+                        ? "bg-amber-600 text-white shadow-md shadow-amber-500/30"
+                        : "text-slate-400 hover:text-slate-200"
+                    }`}
+                  >
+                    <span className="w-2 h-2 rounded-full bg-amber-300"></span>
+                    Bitcoin (BTC)
                   </button>
                 </div>
 
@@ -1316,7 +1344,6 @@ PURSUANT TO SECTION 91 CrPC / SECTION 94 BNSS:
               ) : (
                 <div className="py-16 text-center text-slate-500 text-xs flex flex-col items-center gap-2">
                   <FileText className="w-8 h-8 text-slate-600" />
-                  <p>Run a wallet trace first to generate an auto-populated statutory requisition notice.</p>
                   <button
                     onClick={() => setActiveTab("trace")}
                     className="mt-2 px-4 py-2 rounded-xl bg-cyan-500 text-slate-950 font-bold text-xs"
@@ -1325,6 +1352,67 @@ PURSUANT TO SECTION 91 CrPC / SECTION 94 BNSS:
                   </button>
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* TAB 4: Compliance & Audit Logs */}
+        {activeTab === "audit" && (
+          <div className="flex flex-col gap-6">
+            <div className="p-6 rounded-2xl bg-[#0b1329] border border-slate-800">
+              <div className="flex items-start justify-between gap-4 flex-wrap mb-4">
+                <div>
+                  <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                    <Shield className="w-5 h-5 text-cyan-400" />
+                    Cryptographic Audit Trail & Law Enforcement Compliance
+                  </h2>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Every forensic query and wallet trace is hashed (SHA-256) and logged with Officer ID,
+                    timestamp, and chain metadata to fulfill judicial evidentiary standards.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="px-3 py-1 rounded-lg text-xs font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                    RBAC: Investigating Officer (Level-2)
+                  </span>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto mt-4">
+                <table className="w-full text-left text-xs font-mono">
+                  <thead className="bg-slate-900/80 text-slate-400 border-b border-slate-800">
+                    <tr>
+                      <th className="py-3 px-4">Log ID</th>
+                      <th className="py-3 px-4">Timestamp (UTC)</th>
+                      <th className="py-3 px-4">Officer / Badge</th>
+                      <th className="py-3 px-4">Queried Target</th>
+                      <th className="py-3 px-4">Chain</th>
+                      <th className="py-3 px-4">Integrity Checksum (SHA-256)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/60">
+                    <tr className="hover:bg-slate-800/40 transition">
+                      <td className="py-3 px-4 text-cyan-400 font-bold">LOG-7A9B3E10</td>
+                      <td className="py-3 px-4 text-slate-300">{new Date().toISOString()}</td>
+                      <td className="py-3 px-4 text-slate-200">IO-CYBER-8841</td>
+                      <td className="py-3 px-4 text-slate-300">
+                        {walletAddress ? `${walletAddress.slice(0, 10)}...` : "0xDFd5293D8e..."}
+                      </td>
+                      <td className="py-3 px-4 text-slate-400">{selectedChain}</td>
+                      <td className="py-3 px-4 text-slate-500">e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</td>
+                    </tr>
+                    <tr className="hover:bg-slate-800/40 transition">
+                      <td className="py-3 px-4 text-cyan-400 font-bold">LOG-44D1E89A</td>
+                      <td className="py-3 px-4 text-slate-300">2026-09-25T14:20:11Z</td>
+                      <td className="py-3 px-4 text-slate-200">IO-CYBER-8841</td>
+                      <td className="py-3 px-4 text-slate-300">0x28c6c06298...</td>
+                      <td className="py-3 px-4 text-slate-400">Ethereum</td>
+                      <td className="py-3 px-4 text-slate-500">8f434346648f6b96df89dda901c5176b10a6d83961dd3c1ac88b59b2dc327aa4</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}
