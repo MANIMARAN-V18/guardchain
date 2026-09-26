@@ -37,18 +37,18 @@ def check_btc_exchange(address):
 
 def get_btc_outgoing(address):
     """
-    Fetches outgoing transactions for a Bitcoin address using Mempool.space / Blockstream public APIs.
+    Fetches outgoing transactions for a Bitcoin address using Blockstream & Mempool public APIs.
     """
     endpoints = [
-        f"https://mempool.space/api/address/{address}/txs",
-        f"https://blockstream.info/api/address/{address}/txs"
+        f"https://blockstream.info/api/address/{address}/txs",
+        f"https://mempool.space/api/address/{address}/txs"
     ]
     
     headers = {"User-Agent": "GuardChain-Forensics/2.0"}
     
     for url in endpoints:
         try:
-            r = requests.get(url, headers=headers, timeout=8)
+            r = requests.get(url, headers=headers, timeout=2.5)
             if r.status_code == 200:
                 txs = r.json()
                 outgoing = []
@@ -86,10 +86,11 @@ def trace_btc_wallet(start_address, max_hops=MAX_HOPS):
     edges = []
     visited = set()
     current_layer = [start_address]
+    effective_hops = min(max_hops, 3)
 
-    for hop in range(1, max_hops + 1):
+    for hop in range(1, effective_hops + 1):
         next_layer = []
-        for address in current_layer:
+        for address in current_layer[:2]:  # Limit fan-out to 2 addresses per layer for speed
             if address in visited:
                 continue
             visited.add(address)
@@ -108,8 +109,6 @@ def trace_btc_wallet(start_address, max_hops=MAX_HOPS):
 
                 if not is_ex:
                     next_layer.append(to_addr)
-
-            time.sleep(0.2)
 
         current_layer = next_layer
         if not current_layer:
