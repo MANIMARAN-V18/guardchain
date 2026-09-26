@@ -1,6 +1,6 @@
 [
   {
-    "case_id": "CASE-ETH-0x98A12B-1726002400",
+    "case_id": "CASE-ETH-0x98a12b4c153723d88e91a54bc48348c9e71f1a22",
     "root_wallet": "0x98A12B4c153723d88E91A54bC48348C9E71F1A22",
     "chain": "Ethereum",
     "freeze_score": 75,
@@ -16,7 +16,7 @@
     "edge_count": 3
   },
   {
-    "case_id": "CASE-TRX-TLyqzV-1726003900",
+    "case_id": "CASE-TRO-tkozjansqysuy4butpxzdxcdyx4ojtsska",
     "root_wallet": "TKozjANSQYSUy4BUtPXzDxCdYX4oJTSSKA",
     "chain": "Tron",
     "freeze_score": 90,
@@ -32,23 +32,7 @@
     "edge_count": 2
   },
   {
-    "case_id": "CASE-ETH-0x111-1790406136",
-    "root_wallet": "0x111",
-    "chain": "Ethereum",
-    "freeze_score": 75,
-    "timestamp": "2026-09-26T07:02:16.272786+00:00",
-    "wallets": [
-      "0x111",
-      "0x222",
-      "0x333_binance"
-    ],
-    "exchanges": [
-      "0x333_binance"
-    ],
-    "edge_count": 3
-  },
-  {
-    "case_id": "CASE-TRO-TLyqzVGL-1790425951",
+    "case_id": "CASE-TRO-tlyqzvglv1srkb7dtotaeqgdsfptxrjzyh",
     "root_wallet": "TLyqzVGLV1srkB7dToTAEqgDSfPtXRJZYH",
     "chain": "Tron",
     "freeze_score": 0,
@@ -60,21 +44,7 @@
     "edge_count": 0
   },
   {
-    "case_id": "CASE-TRO-TNiMBwWe-1790425995",
-    "root_wallet": "TNiMBwWerEN5mZ6giFqNLp6bMAD3Qt2CpR",
-    "chain": "Tron",
-    "freeze_score": 15,
-    "timestamp": "2026-09-26T12:33:15.778636+00:00",
-    "wallets": [
-      "TZG2YtMA28c9EuxeXXz7c8U7X7DwbJMhdM",
-      "TNiMBwWerEN5mZ6giFqNLp6bMAD3Qt2CpR",
-      "TP96V2AQaF8BWUWYAvHerBNuK72uoHcEur"
-    ],
-    "exchanges": [],
-    "edge_count": 2
-  },
-  {
-    "case_id": "CASE-TRO-TNiMBwWe-1790426634",
+    "case_id": "CASE-TRO-tnimbwweren5mz6gifqnlp6bmad3qt2cpr",
     "root_wallet": "TNiMBwWerEN5mZ6giFqNLp6bMAD3Qt2CpR",
     "chain": "Tron",
     "freeze_score": 15,
@@ -88,19 +58,7 @@
     "edge_count": 2
   },
   {
-    "case_id": "CASE-ETH-0xtest-1790428923",
-    "root_wallet": "0xtest",
-    "chain": "Ethereum",
-    "freeze_score": 50,
-    "timestamp": "2026-09-26T13:22:03.225807+00:00",
-    "wallets": [
-      "0xtest"
-    ],
-    "exchanges": [],
-    "edge_count": 0
-  },
-  {
-    "case_id": "CASE-TRO-TJRabPrw-1790429822",
+    "case_id": "CASE-TRO-tjrabprwbzy45sbavfcjinpjc18kjprtv8",
     "root_wallet": "TJRabPrwbZy45sbavfcjinPJC18kjpRTv8",
     "chain": "Tron",
     "freeze_score": 15,
