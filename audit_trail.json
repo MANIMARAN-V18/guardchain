@@ -1,5 +1,15 @@
 [
   {
+    "log_id": "LOG-8338ff32b1",
+    "timestamp": "2026-09-26T14:02:34.373969+00:00",
+    "officer_id": "IO-CYBER-8841",
+    "role": "Investigating Officer",
+    "wallet_queried": "0xDFd5293D8e347dFe59E90eFd55b2956a1343963d",
+    "chain": "Ethereum",
+    "ip_address": "127.0.0.1 (Localhost)",
+    "integrity_checksum": "8338ff32b191914129fc0f09052e2130ee0f6d26d5ae484b49f7d494db83da09"
+  },
+  {
     "log_id": "LOG-ad9bdf6e01",
     "timestamp": "2026-09-26T13:42:35.971508+00:00",
     "officer_id": "IO-CYBER-8841",

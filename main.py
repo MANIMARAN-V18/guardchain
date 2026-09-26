@@ -16,9 +16,11 @@ Complete Feature Set:
 """
 
 import io
+import re
 import csv
-from fastapi import FastAPI, Query, HTTPException, Response
+from fastapi import FastAPI, Query, HTTPException, Response, Request
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from trace import trace_wallet
 from tron_trace import trace_tron_wallet
@@ -38,14 +40,50 @@ app = FastAPI(
     version="2.0.0"
 )
 
+# --- Security Headers Middleware ---
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+        return response
+
+app.add_middleware(SecurityHeadersMiddleware)
+
 # CORS configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "OPTIONS"],
     allow_headers=["*"],
 )
+
+
+def validate_wallet_address(address: str, chain: str) -> str:
+    """
+    Strict cryptographic address format validation to prevent injection or malicious inputs.
+    """
+    clean_addr = address.strip()
+    chain_clean = chain.strip().lower()
+
+    if chain_clean == "ethereum":
+        if not re.match(r"^0x[a-fA-F0-9]{40}$", clean_addr):
+            raise HTTPException(status_code=400, detail="Invalid Ethereum address format (must be 42-char hex with 0x prefix).")
+    elif chain_clean == "tron":
+        if not re.match(r"^T[1-9A-HJ-NP-za-km-z]{33}$", clean_addr):
+            raise HTTPException(status_code=400, detail="Invalid Tron address format (must be 34-char base58 starting with T).")
+    elif chain_clean in ["bitcoin", "btc"]:
+        if not re.match(r"^(bc1[a-z0-9]{25,90}|[13][a-km-zA-HJ-NP-Z1-9]{25,34})$", clean_addr):
+            raise HTTPException(status_code=400, detail="Invalid Bitcoin address format (must be valid Bech32 or Base58 address).")
+    else:
+        if not re.match(r"^[a-zA-Z0-9]{8,100}$", clean_addr):
+            raise HTTPException(status_code=400, detail="Invalid wallet address characters.")
+
+    return clean_addr
 
 
 @app.get("/")
@@ -55,7 +93,7 @@ def root():
         "version": "2.0.0",
         "supported_chains": ["Ethereum", "Tron (TRC20 USDT)", "Bitcoin (Blockchair/UTXO)"],
         "status": "operational",
-        "compliance": "100% Free-Tier & Open Source"
+        "compliance": "100% Free-Tier, GDPR & DPDP Compliant"
     }
 
 
@@ -143,14 +181,14 @@ def _run_trace_pipeline(wallet_address: str, chain: str = "Ethereum", hops: int 
 @app.get("/trace/{wallet_address}")
 def trace(
     wallet_address: str,
+    request: Request,
     chain: str = Query("Ethereum", description="Blockchain network: Ethereum, Tron, or Bitcoin"),
     hops: int = Query(4, ge=1, le=6, description="Trace depth"),
     usdt_only: bool = Query(True, description="Filter Tron transfers to USDT-only (ignoring random meme/airdrop tokens)")
 ):
-    if not wallet_address or len(wallet_address.strip()) < 8:
-        raise HTTPException(status_code=400, detail="Invalid wallet address provided.")
-
-    return _run_trace_pipeline(wallet_address.strip(), chain=chain, hops=hops, usdt_only=usdt_only)
+    valid_addr = validate_wallet_address(wallet_address, chain)
+    client_ip = request.client.host if request.client else "127.0.0.1"
+    return _run_trace_pipeline(valid_addr, chain=chain, hops=hops, usdt_only=usdt_only)
 
 
 @app.get("/trace/{wallet_address}/report")
@@ -160,10 +198,8 @@ def download_pdf_report(
     hops: int = Query(4, ge=1, le=6),
     usdt_only: bool = Query(True, description="Filter Tron transfers to USDT-only")
 ):
-    if not wallet_address or len(wallet_address.strip()) < 8:
-        raise HTTPException(status_code=400, detail="Invalid wallet address.")
-
-    data = _run_trace_pipeline(wallet_address.strip(), chain=chain, hops=hops, usdt_only=usdt_only)
+    valid_addr = validate_wallet_address(wallet_address, chain)
+    data = _run_trace_pipeline(valid_addr, chain=chain, hops=hops, usdt_only=usdt_only)
     pdf_bytes = generate_pdf_report(
         wallet_address=data["wallet"],
         edges=data["edges"],
@@ -173,7 +209,7 @@ def download_pdf_report(
         anomaly_info=data["statistical_anomaly"]
     )
 
-    clean_addr = wallet_address.strip()[:10]
+    clean_addr = valid_addr[:10]
     filename = f"guardchain_trace_{data['chain'].lower()}_{clean_addr}.pdf"
     
     return Response(
@@ -195,7 +231,8 @@ def export_ledger_csv(
     """
     Exports the full traced transaction ledger to CSV.
     """
-    data = _run_trace_pipeline(wallet_address.strip(), chain=chain, hops=hops)
+    valid_addr = validate_wallet_address(wallet_address, chain)
+    data = _run_trace_pipeline(valid_addr, chain=chain, hops=hops)
     edges = data.get("edges", [])
     
     output = io.StringIO()
@@ -210,7 +247,7 @@ def export_ledger_csv(
     return Response(
         content=output.getvalue(),
         media_type="text/csv",
-        headers={"Content-Disposition": f'attachment; filename="guardchain_ledger_{wallet_address[:8]}.csv"'}
+        headers={"Content-Disposition": f'attachment; filename="guardchain_ledger_{valid_addr[:8]}.csv"'}
     )
 
 
@@ -219,7 +256,8 @@ def get_notice(
     wallet_address: str,
     chain: str = Query("Ethereum")
 ):
-    data = _run_trace_pipeline(wallet_address.strip(), chain=chain, hops=4)
+    valid_addr = validate_wallet_address(wallet_address, chain)
+    data = _run_trace_pipeline(valid_addr, chain=chain, hops=4)
     return data["draft_notice"]
 
 
