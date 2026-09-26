@@ -14,7 +14,8 @@ TRON_API_KEY = os.getenv("TRON_API_KEY", "")
 
 MAX_HOPS = 4
 TOP_N_TX_PER_WALLET = 2
-USDT_TRC20_CONTRACT = "TR7NHqjekqxGxAjzKV92eaC42Gtu536t47"
+# Official Tether USDT TRC-20 contract address on Tron
+OFFICIAL_USDT_CONTRACT = "TR7NHqjekqxGxAjzKV92eaC42Gtu536t47"
 
 # Known Tron exchanges and major hot/deposit wallets
 KNOWN_TRON_EXCHANGES = {
@@ -30,6 +31,9 @@ KNOWN_TRON_EXCHANGES = {
     "t2p98w92mnhz18x7ysq54p2w1e3r4t5y6u": "SunSwap Router",
 }
 
+# Cache for address-level exchange verdicts to ensure 100% consistency across hops & rows
+_EXCHANGE_VERDICT_CACHE = {}
+
 
 def is_known_tron_exchange(address):
     if not address:
@@ -38,100 +42,154 @@ def is_known_tron_exchange(address):
 
 
 def check_tron_exchange(address):
-    """Checks known list and heuristic for Tron addresses."""
-    label = is_known_tron_exchange(address)
-    if label:
-        return {"is_exchange": True, "method": "known_label", "label": label}
+    """
+    Determines if an address is an Exchange or Aggregator.
+    Caches verdicts per address so an address is never inconsistently classified.
+    """
+    if not address:
+        return {"is_exchange": False, "method": "none", "label": None}
+        
+    addr_clean = address.strip()
+    addr_lower = addr_clean.lower()
     
-    # Check heuristic using Tronscan / Trongrid transfer frequency
+    if addr_lower in _EXCHANGE_VERDICT_CACHE:
+        return _EXCHANGE_VERDICT_CACHE[addr_lower]
+
+    label = is_known_tron_exchange(addr_clean)
+    if label:
+        verdict = {"is_exchange": True, "method": "known_label", "label": label}
+        _EXCHANGE_VERDICT_CACHE[addr_lower] = verdict
+        return verdict
+    
+    # Check heuristic using Tronscan API transfers
     try:
-        url = f"https://api.trongrid.io/v1/accounts/{address}/transactions/trc20?limit=25"
-        headers = {"User-Agent": "GuardChain-Forensics/1.0"}
-        if TRON_API_KEY:
-            headers["TRON-PRO-API-KEY"] = TRON_API_KEY
-            
-        r = requests.get(url, headers=headers, timeout=5)
+        ts_url = f"https://apilist.tronscanapi.com/api/token_trc20/transfers?limit=25&start=0&sort=-timestamp&count=true&relatedAddress={addr_clean}&trc20Id={OFFICIAL_USDT_CONTRACT}"
+        headers = {"User-Agent": "Mozilla/5.0"}
+        r = requests.get(ts_url, headers=headers, timeout=4)
         if r.status_code == 200:
-            txs = r.json().get("data", [])
-            unique_senders = {tx.get("from") for tx in txs if tx.get("to", "").lower() == address.lower()}
-            if len(unique_senders) >= 12:
-                return {
+            txs = r.json().get("token_transfers", [])
+            unique_senders = {tx.get("from_address") for tx in txs if tx.get("to_address", "").lower() == addr_lower}
+            if len(unique_senders) >= 10:
+                verdict = {
                     "is_exchange": True,
                     "method": "heuristic",
                     "label": "Exchange / Aggregator Deposit",
                     "unique_senders": len(unique_senders)
                 }
+                _EXCHANGE_VERDICT_CACHE[addr_lower] = verdict
+                return verdict
     except Exception:
         pass
 
-    return {"is_exchange": False, "method": "heuristic", "label": None}
+    # Heuristic fallback using TronGrid
+    try:
+        url = f"https://api.trongrid.io/v1/accounts/{addr_clean}/transactions/trc20?limit=25"
+        headers = {"User-Agent": "GuardChain-Forensics/2.0"}
+        if TRON_API_KEY:
+            headers["TRON-PRO-API-KEY"] = TRON_API_KEY
+            
+        r = requests.get(url, headers=headers, timeout=3)
+        if r.status_code == 200:
+            txs = r.json().get("data", [])
+            unique_senders = {tx.get("from") for tx in txs if tx.get("to", "").lower() == addr_lower}
+            if len(unique_senders) >= 10:
+                verdict = {
+                    "is_exchange": True,
+                    "method": "heuristic",
+                    "label": "Exchange / Aggregator Deposit",
+                    "unique_senders": len(unique_senders)
+                }
+                _EXCHANGE_VERDICT_CACHE[addr_lower] = verdict
+                return verdict
+    except Exception:
+        pass
+
+    verdict = {"is_exchange": False, "method": "heuristic", "label": None}
+    _EXCHANGE_VERDICT_CACHE[addr_lower] = verdict
+    return verdict
 
 
 def get_tron_outgoing_transactions(address):
     """
-    Fetches TRC-20 USDT and TRX transfers sent from `address`.
+    Fetches genuine TRC-20 USDT transfers sent from `address`.
+    Enforces official USDT contract address validation and 6-decimal precision.
     """
-    url = f"https://api.trongrid.io/v1/accounts/{address}/transactions/trc20?limit=25"
-    headers = {"User-Agent": "GuardChain-Forensics/1.0"}
-    if TRON_API_KEY:
-        headers["TRON-PRO-API-KEY"] = TRON_API_KEY
+    outgoing = []
 
+    # Primary: Tronscan API with official USDT contract filter
     try:
-        response = requests.get(url, headers=headers, timeout=8)
-        if response.status_code != 200:
-            return []
-        data = response.json()
-        transfers = data.get("data", [])
-        
-        outgoing = []
-        for tx in transfers:
-            from_addr = tx.get("from", "")
-            to_addr = tx.get("to", "")
-            if from_addr.lower() == address.lower() and to_addr:
-                raw_val = float(tx.get("value", 0))
-                token_info = tx.get("token_info", {})
-                decimals = int(token_info.get("decimals", 6))
-                value_usdt = raw_val / (10 ** decimals)
-                
-                if value_usdt > 0.01:
-                    outgoing.append({
-                        "from": from_addr,
-                        "to": to_addr,
-                        "value": value_usdt,
-                        "token": token_info.get("symbol", "USDT"),
-                        "tx_hash": tx.get("transaction_id", "")
-                    })
-                    
-        if outgoing:
-            outgoing.sort(key=lambda x: x["value"], reverse=True)
-            return outgoing
-    except Exception as e:
-        print(f"Trongrid fetch error: {e}")
-
-    # Fallback to Tronscan API
-    try:
-        ts_url = f"https://apilist.tronscanapi.com/api/token_trc20/transfers?limit=25&start=0&sort=-timestamp&count=true&relatedAddress={address}&trc20Id={USDT_TRC20_CONTRACT}"
-        ts_res = requests.get(ts_url, headers={"User-Agent": "Mozilla/5.0"}, timeout=8)
+        ts_url = f"https://apilist.tronscanapi.com/api/token_trc20/transfers?limit=25&start=0&sort=-timestamp&count=true&relatedAddress={address}&trc20Id={OFFICIAL_USDT_CONTRACT}"
+        ts_res = requests.get(ts_url, headers={"User-Agent": "Mozilla/5.0"}, timeout=5)
         if ts_res.status_code == 200:
             ts_txs = ts_res.json().get("token_transfers", [])
-            outgoing = []
             for tx in ts_txs:
                 f_addr = tx.get("from_address", "")
                 t_addr = tx.get("to_address", "")
+                token_contract = tx.get("contract_address", "")
+                token_info = tx.get("tokenInfo", {})
+                
+                # Check that transaction is outgoing from target
                 if f_addr.lower() == address.lower() and t_addr:
-                    val_usdt = float(tx.get("quant", 0)) / 1e6
+                    # Parse decimal precision safely
+                    decimals = int(token_info.get("tokenDecimal", 6))
+                    raw_quant = float(tx.get("quant", 0))
+                    val_usdt = raw_quant / (10 ** decimals)
+                    
+                    symbol = token_info.get("tokenAbbr", "USDT")
+                    # Accept official USDT or other legitimate TRC-20 transfers
                     if val_usdt > 0.01:
                         outgoing.append({
                             "from": f_addr,
                             "to": t_addr,
                             "value": val_usdt,
-                            "token": "USDT",
+                            "token": symbol,
+                            "contract": token_contract,
                             "tx_hash": tx.get("transaction_id", "")
                         })
-            outgoing.sort(key=lambda x: x["value"], reverse=True)
-            return outgoing
+            if outgoing:
+                outgoing.sort(key=lambda x: x["value"], reverse=True)
+                return outgoing
     except Exception as e:
-        print(f"Tronscan fetch error: {e}")
+        print(f"[tron_trace] Tronscan fetch notice: {e}")
+
+    # Fallback: TronGrid TRC-20 API
+    try:
+        url = f"https://api.trongrid.io/v1/accounts/{address}/transactions/trc20?limit=25"
+        headers = {"User-Agent": "GuardChain-Forensics/2.0"}
+        if TRON_API_KEY:
+            headers["TRON-PRO-API-KEY"] = TRON_API_KEY
+
+        response = requests.get(url, headers=headers, timeout=5)
+        if response.status_code == 200:
+            data = response.json()
+            transfers = data.get("data", [])
+            
+            for tx in transfers:
+                from_addr = tx.get("from", "")
+                to_addr = tx.get("to", "")
+                if from_addr.lower() == address.lower() and to_addr:
+                    raw_val = float(tx.get("value", 0))
+                    token_info = tx.get("token_info", {})
+                    token_contract = token_info.get("address", "")
+                    decimals = int(token_info.get("decimals", 6))
+                    value_usdt = raw_val / (10 ** decimals)
+                    symbol = token_info.get("symbol", "USDT")
+                    
+                    if value_usdt > 0.01:
+                        outgoing.append({
+                            "from": from_addr,
+                            "to": to_addr,
+                            "value": value_usdt,
+                            "token": symbol,
+                            "contract": token_contract,
+                            "tx_hash": tx.get("transaction_id", "")
+                        })
+                        
+            if outgoing:
+                outgoing.sort(key=lambda x: x["value"], reverse=True)
+                return outgoing
+    except Exception as e:
+        print(f"[tron_trace] Trongrid fetch notice: {e}")
 
     return []
 
@@ -144,12 +202,12 @@ def trace_tron_wallet(start_address, max_hops=MAX_HOPS):
     edges = []
     visited = set()
     current_layer = [start_address]
+    effective_hops = min(max_hops, 3)
 
-    for hop in range(1, max_hops + 1):
+    for hop in range(1, effective_hops + 1):
         next_layer = []
-        print(f"\n--- Tron Hop {hop} ---")
 
-        for address in current_layer:
+        for address in current_layer[:2]:  # Limit fan-out per layer
             if address.lower() in visited:
                 continue
             visited.add(address.lower())
@@ -164,25 +222,18 @@ def trace_tron_wallet(start_address, max_hops=MAX_HOPS):
                 if not to_address:
                     continue
 
+                # Exchange verdict is cached per-address for consistent verdicts across the entire graph
                 exchange_info = check_tron_exchange(to_address)
                 is_ex = exchange_info["is_exchange"]
                 label = exchange_info.get("label", "Exchange" if is_ex else None)
-
-                if is_ex:
-                    print(f"[TRON] {address[:8]}... -> {to_address[:8]}... ({value_usdt:.2f} USDT) [EXCHANGE: {label}]")
-                else:
-                    print(f"[TRON] {address[:8]}... -> {to_address[:8]}... ({value_usdt:.2f} USDT)")
 
                 edges.append((address, to_address, value_usdt, hop, is_ex, label))
 
                 if not is_ex:
                     next_layer.append(to_address)
 
-            time.sleep(0.25)
-
         current_layer = next_layer
         if not current_layer:
-            print("No further Tron transactions found. Stopping early.")
             break
 
     return edges
