@@ -218,5 +218,60 @@
     ],
     "exchanges": [],
     "edge_count": 2
+  },
+  {
+    "case_id": "CASE-BIT-bc1qm34l-1790427957",
+    "root_wallet": "bc1qm34lsc65zpw79lxes69zkqmk6ee3ewf0j77s3h",
+    "chain": "Bitcoin",
+    "freeze_score": 0,
+    "timestamp": "2026-09-26T13:05:57.679983+00:00",
+    "wallets": [
+      "bc1qm34lsc65zpw79lxes69zkqmk6ee3ewf0j77s3h"
+    ],
+    "exchanges": [],
+    "edge_count": 0
+  },
+  {
+    "case_id": "CASE-BIT-bc1qm34l-1790427972",
+    "root_wallet": "bc1qm34lsc65zpw79lxes69zkqmk6ee3ewf0j77s3h",
+    "chain": "Bitcoin",
+    "freeze_score": 0,
+    "timestamp": "2026-09-26T13:06:12.451038+00:00",
+    "wallets": [
+      "bc1qm34lsc65zpw79lxes69zkqmk6ee3ewf0j77s3h"
+    ],
+    "exchanges": [],
+    "edge_count": 0
+  },
+  {
+    "case_id": "CASE-BIT-bc1qm34l-1790428176",
+    "root_wallet": "bc1qm34lsc65zpw79lxes69zkqmk6ee3ewf0j77s3h",
+    "chain": "Bitcoin",
+    "freeze_score": 15,
+    "timestamp": "2026-09-26T13:09:36.129037+00:00",
+    "wallets": [
+      "17E7GkVWowAYLmoEQKUy5QC6egi8WTR28R",
+      "bc1qm34lsc65zpw79lxes69zkqmk6ee3ewf0j77s3h",
+      "bc1q6fm0lp0axqmy9vry0n079akq5rl649l7remjxq"
+    ],
+    "exchanges": [],
+    "edge_count": 2
+  },
+  {
+    "case_id": "CASE-BIT-bc1qm34l-1790428206",
+    "root_wallet": "bc1qm34lsc65zpw79lxes69zkqmk6ee3ewf0j77s3h",
+    "chain": "Bitcoin",
+    "freeze_score": 15,
+    "timestamp": "2026-09-26T13:10:06.567421+00:00",
+    "wallets": [
+      "bc1q6fm0lp0axqmy9vry0n079akq5rl649l7remjxq",
+      "bc1qnecufhyxp2dlymcs63asygydjs9x2k55scuc5s",
+      "bc1qm34lsc65zpw79lxes69zkqmk6ee3ewf0j77s3h",
+      "17E7GkVWowAYLmoEQKUy5QC6egi8WTR28R",
+      "1GrwDkr33gT6LuumniYjKEGjTLhsL5kmqC",
+      "1DJs8ypvTpn9DRJxMXoZx5LfwLLyXb5pqo"
+    ],
+    "exchanges": [],
+    "edge_count": 6
   }
 ]

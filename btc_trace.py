@@ -1,7 +1,7 @@
 """
 Bitcoin (BTC) Tracing Module for GuardChain
-Queries public Blockchain.info & Blockchair free API endpoints to trace Bitcoin transaction flows,
-UTXO peeling chains, and centralized exchange deposit wallets.
+Queries high-performance public Mempool.space and Blockstream APIs to trace Bitcoin UTXO transaction flows,
+peeling chains, and centralized exchange deposit wallets.
 """
 
 import time
@@ -16,7 +16,7 @@ KNOWN_BTC_EXCHANGES = {
     "34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo": "Binance Hot Wallet",
     "35hK24tcChxbpnTbEgcGngdE2MtMeMVGJP": "Coinbase Prime",
     "1FzWLWTHRmsYrBtCiUCq7SfPT2KEC2SuZu": "Bitfinex",
-    "bc1qm34lsc65zpw79lxes69zkqmk6ee3ewf0j77s3h": "Binance Bech32",
+    "bc1qm34lsc65zpw79lxes69zkqmk6ee3ewf0j77s3h": "Binance Bech32 Hot Wallet",
     "1AnwDVbwsLBNo1G4bNxkP7w2L4J7T4P5fB": "Kraken",
     "3D2oetdNuZUqQHPJmcMDDHYoqkyNVsFDe9": "OKX Exchange",
 }
@@ -37,45 +37,51 @@ def check_btc_exchange(address):
 
 def get_btc_outgoing(address):
     """
-    Fetches outgoing transactions for a Bitcoin address using Blockchain.info public free API.
+    Fetches outgoing transactions for a Bitcoin address using Mempool.space / Blockstream public APIs.
     """
-    url = f"https://blockchain.info/rawaddr/{address}?limit=15"
-    try:
-        r = requests.get(url, headers={"User-Agent": "GuardChain-Forensics/1.0"}, timeout=8)
-        if r.status_code != 200:
-            return []
-        data = r.json()
-        txs = data.get("txs", [])
-        
-        outgoing = []
-        for tx in txs:
-            inputs = [inp.get("prev_out", {}).get("addr") for inp in tx.get("inputs", []) if inp.get("prev_out")]
-            if address in inputs:
-                # Find downstream outputs not returning to self
-                for out in tx.get("out", []):
-                    dest_addr = out.get("addr")
-                    val_sat = out.get("value", 0)
-                    val_btc = val_sat / 1e8
-                    
-                    if dest_addr and dest_addr != address and val_btc > 0.0001:
-                        outgoing.append({
-                            "from": address,
-                            "to": dest_addr,
-                            "value": val_btc,
-                            "tx_hash": tx.get("hash", "")
-                        })
-                        
-        outgoing.sort(key=lambda x: x["value"], reverse=True)
-        return outgoing
-    except Exception as e:
-        print(f"[btc_trace] Error fetching Bitcoin transactions: {e}")
-        return []
+    endpoints = [
+        f"https://mempool.space/api/address/{address}/txs",
+        f"https://blockstream.info/api/address/{address}/txs"
+    ]
+    
+    headers = {"User-Agent": "GuardChain-Forensics/2.0"}
+    
+    for url in endpoints:
+        try:
+            r = requests.get(url, headers=headers, timeout=8)
+            if r.status_code == 200:
+                txs = r.json()
+                outgoing = []
+                for tx in txs:
+                    # Check if target address is in inputs (sent funds)
+                    inputs = [inp.get("prevout", {}).get("scriptpubkey_address") for inp in tx.get("vin", []) if inp.get("prevout")]
+                    if address in inputs:
+                        for out in tx.get("vout", []):
+                            dest_addr = out.get("scriptpubkey_address")
+                            val_sat = out.get("value", 0)
+                            val_btc = float(val_sat) / 1e8
+                            
+                            # Avoid change outputs back to self and tiny dust
+                            if dest_addr and dest_addr != address and val_btc > 0.0001:
+                                outgoing.append({
+                                    "from": address,
+                                    "to": dest_addr,
+                                    "value": val_btc,
+                                    "tx_hash": tx.get("txid", "")
+                                })
+                if outgoing:
+                    outgoing.sort(key=lambda x: x["value"], reverse=True)
+                    return outgoing
+        except Exception as e:
+            print(f"[btc_trace] Error querying {url}: {e}")
+
+    return []
 
 
 def trace_btc_wallet(start_address, max_hops=MAX_HOPS):
     """
     Traces Bitcoin UTXO hops recursively.
-    Returns: (from_address, to_address, value_btc, hop, is_exchange, exchange_label)
+    Returns: list of (from_address, to_address, value_btc, hop, is_exchange, exchange_label)
     """
     edges = []
     visited = set()
@@ -103,7 +109,7 @@ def trace_btc_wallet(start_address, max_hops=MAX_HOPS):
                 if not is_ex:
                     next_layer.append(to_addr)
 
-            time.sleep(0.3)
+            time.sleep(0.2)
 
         current_layer = next_layer
         if not current_layer:
